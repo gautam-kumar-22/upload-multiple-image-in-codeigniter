@@ -1,0 +1,47 @@
+<?php
+class Home extends CI_Controller
+{
+  function __Construct(){
+		parent::__Construct();
+		$this->load->model('upload_model');
+		$this->load->helper(array('form', 'url'));
+	}
+	function index(){
+		$this->load->view('upload_form', array('error' => ' ' ));
+	}
+	function do_upload(){
+		$config['upload_path']='upload/';
+		$config['allowed_types']='png|jpg|jpeg|gif|mp3|mpeg|sql';
+		$config['max_size']  = '0';
+		$config['max_width']  = '0';
+		$config['max_height']  = '0';
+		$this->load->library('upload', $config);
+		if ( ! $this->upload->do_upload('image'))
+		{
+			$error = array('error' => $this->upload->display_errors());
+			$this->load->view('upload_form', $error);
+		}
+		else
+		{
+			$data = array('upload_data' => $this->upload->data('image'));
+			//$this->upload_model->model('name');
+			
+			//$name=$data['upload_data']['file_name'];
+			//echo $name;
+			//$this->session->set_userdata('name',$name);
+			$this->load->view('upload_success', $data);
+		}
+		/*$data = array('upload_data' => $this->upload->data());
+		$this->upload->do_upload('image');
+		$this->load->view('upload_success',$data);*/
+	}
+	function download(){
+		//echo $this->uri->segment(3);
+		$name=$this->uri->segment(3);
+		$this->load->helper('download');
+		$data = file_get_contents('upload/'.$name); 
+		force_download($name, $data);
+ 	}	
+}
+
+?>
